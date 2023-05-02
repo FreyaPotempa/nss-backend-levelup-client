@@ -1,13 +1,17 @@
 import React, { useEffect, useState } from "react";
-import { getGames } from "../../managers/GameManager.js";
+import { deleteGame, getGames } from "../../managers/GameManager.js";
 import { useNavigate } from "react-router-dom";
 
 export const GameList = (props) => {
   const [games, setGames] = useState([]);
   const navigate = useNavigate();
 
-  useEffect(() => {
+  const fetchGames = () => {
     getGames().then((data) => setGames(data));
+  };
+
+  useEffect(() => {
+    fetchGames();
   }, []);
 
   return (
@@ -33,6 +37,21 @@ export const GameList = (props) => {
               <div className="game__skillLevel">
                 Skill level is {game.skill_level}
               </div>
+              <button
+                type="button"
+                onClick={() => {
+                  navigate(`/games/edit/${game.id}`);
+                }}
+              >
+                Edit
+              </button>
+              <button
+                type="button"
+                onClick={() => deleteGame(game.id).then(fetchGames())}
+                //page doesn't auto-refresh, come back and fix? Maybe.
+              >
+                Delete
+              </button>
             </section>
           );
         })}

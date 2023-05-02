@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { getEvents } from "../../managers/EventManager";
+import { deleteEvent, getEvents } from "../../managers/EventManager";
 import { useNavigate } from "react-router-dom";
 
 export const EventList = (props) => {
@@ -31,6 +31,18 @@ export const EventList = (props) => {
               <div className="event__organizer">
                 Organized by {event.organizer_id}
               </div>
+              <button
+                type="button"
+                onClick={() => navigate(`/events/edit/${event.id}`)}
+              >
+                Edit
+              </button>
+              <button
+                type="button"
+                onClick={() => deleteEvent(event.id).then(navigate("/events"))}
+              >
+                Delete
+              </button>
             </section>
           );
         })}

@@ -1,16 +1,16 @@
 import { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
-import { createGame, getGameTypes } from "../../managers/GameManager.js";
+import { useNavigate, useParams } from "react-router-dom";
+import {
+  createGame,
+  getGameTypes,
+  getSingleGame,
+  updateGame,
+} from "../../managers/GameManager.js";
 
 export const GameForm = () => {
+  const { game_id } = useParams();
   const navigate = useNavigate();
   const [gameTypes, setGameTypes] = useState([]);
-
-  /*
-        Since the input fields are bound to the values of
-        the properties of this state variable, you need to
-        provide some default values.
-    */
   const [currentGame, setCurrentGame] = useState({
     skillLevel: 1,
     numOfPlayers: 0,
@@ -21,7 +21,12 @@ export const GameForm = () => {
 
   useEffect(() => {
     getGameTypes().then((data) => setGameTypes(data));
-  }, []);
+    if (game_id) {
+      getSingleGame(game_id).then((gameObj) => {
+        setCurrentGame(gameObj);
+      });
+    }
+  }, [game_id]);
 
   const changeGameState = (domEvent) => {
     const { name, value } = domEvent.target;
@@ -33,7 +38,10 @@ export const GameForm = () => {
 
   return (
     <form className="gameForm">
-      <h2 className="gameForm__title">Register New Game</h2>
+      <h2 className="gameForm__title">
+        {game_id ? "Edit " : "Create "}
+        Game
+      </h2>
       <fieldset>
         <div className="form-group">
           <label htmlFor="title">Title: </label>
@@ -107,20 +115,30 @@ export const GameForm = () => {
           // Prevent form from being submitted
           evt.preventDefault();
 
-          const game = {
-            maker: currentGame.maker,
-            title: currentGame.title,
-            num_of_players: parseInt(currentGame.numOfPlayers),
-            skill_level: parseInt(currentGame.skillLevel),
-            game_type: parseInt(currentGame.gameTypeId),
-          };
-
-          // Send POST request to your API
-          createGame(game).then(() => navigate("/games"));
+          if (game_id) {
+            let editGame = {
+              ...currentGame,
+              num_of_players: parseInt(currentGame.numOfPlayers),
+              skill_level: parseInt(currentGame.skillLevel),
+              game_type: parseInt(currentGame.gameTypeId),
+              id: game_id,
+            };
+            console.log(editGame);
+            updateGame(editGame).then(() => navigate(`/games`));
+          } else {
+            const game = {
+              maker: currentGame.maker,
+              title: currentGame.title,
+              num_of_players: parseInt(currentGame.numOfPlayers),
+              skill_level: parseInt(currentGame.skillLevel),
+              game_type: parseInt(currentGame.gameTypeId),
+            };
+            createGame(game).then(() => navigate("/games"));
+          }
         }}
         className="btn btn-primary"
       >
-        Create
+        {game_id ? "Edit" : "Create"}
       </button>
     </form>
   );

@@ -1,14 +1,26 @@
-import { useNavigate } from "react-router-dom";
-import { createNewEvent } from "../../managers/EventManager";
-import { useState } from "react";
+import { useNavigate, useParams } from "react-router-dom";
+import {
+  createNewEvent,
+  getSingleEvent,
+  updateEvent,
+} from "../../managers/EventManager";
+import { useEffect, useState } from "react";
+import { getSingleGame } from "../../managers/GameManager";
 
 export const EventForm = () => {
+  const { event_id } = useParams();
   const navigate = useNavigate();
   const [currentEvent, setCurrentEvent] = useState({
     description: "",
     date: "",
     time: "",
   });
+
+  useEffect(() => {
+    if (event_id) {
+      getSingleEvent(event_id).then((eventObj) => setCurrentEvent(eventObj));
+    }
+  }, [event_id]);
 
   //   useEffect(() => {
   //     getGameTypes().then((data) => setGameTypes(data));
@@ -24,7 +36,9 @@ export const EventForm = () => {
 
   return (
     <form className="eventForm">
-      <h2 className="eventForm__title">Register New Event</h2>
+      <h2 className="eventForm__title">
+        {event_id ? "Edit " : "Create "}Event
+      </h2>
       <fieldset>
         <div className="form-group">
           <label htmlFor="description">Description: </label>
@@ -70,12 +84,16 @@ export const EventForm = () => {
           // Prevent form from being submitted
           evt.preventDefault();
 
-          // Send POST request to your API
-          createNewEvent(currentEvent).then(() => navigate("/events"));
+          if (event_id) {
+            updateEvent(currentEvent).then(() => navigate("/events"));
+          } else {
+            // Send POST request to your API
+            createNewEvent(currentEvent).then(() => navigate("/events"));
+          }
         }}
         className="btn btn-primary"
       >
-        Create
+        {event_id ? "Edit" : "Create"}
       </button>
     </form>
   );
