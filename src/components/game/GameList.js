@@ -47,8 +47,7 @@ export const GameList = (props) => {
               </button>
               <button
                 type="button"
-                onClick={() => deleteGame(game.id).then(fetchGames())}
-                //page doesn't auto-refresh, come back and fix? Maybe.
+                onClick={() => deleteGame(game.id).then(() => fetchGames())}
               >
                 Delete
               </button>

@@ -1,13 +1,22 @@
 import React, { useEffect, useState } from "react";
-import { deleteEvent, getEvents } from "../../managers/EventManager";
+import {
+  deleteEvent,
+  getEvents,
+  joinEvent,
+  leaveEvent,
+} from "../../managers/EventManager";
 import { useNavigate } from "react-router-dom";
 
 export const EventList = (props) => {
   const navigate = useNavigate();
   const [events, setEvents] = useState([]);
 
-  useEffect(() => {
+  const fetchEvents = () => {
     getEvents().then((data) => setEvents(data));
+  };
+
+  useEffect(() => {
+    fetchEvents();
   }, []);
 
   return (
@@ -31,6 +40,29 @@ export const EventList = (props) => {
               <div className="event__organizer">
                 Organized by {event.organizer_id}
               </div>
+              {event.joined ? (
+                <button
+                  type="button"
+                  onClick={() =>
+                    leaveEvent(event.id).then(() => {
+                      fetchEvents();
+                    })
+                  }
+                >
+                  Leave
+                </button>
+              ) : (
+                <button
+                  type="button"
+                  onClick={() =>
+                    joinEvent(event.id).then(() => {
+                      fetchEvents();
+                    })
+                  }
+                >
+                  Join
+                </button>
+              )}
               <button
                 type="button"
                 onClick={() => navigate(`/events/edit/${event.id}`)}
@@ -39,7 +71,11 @@ export const EventList = (props) => {
               </button>
               <button
                 type="button"
-                onClick={() => deleteEvent(event.id).then(navigate("/events"))}
+                onClick={() =>
+                  deleteEvent(event.id).then(() => {
+                    fetchEvents();
+                  })
+                }
               >
                 Delete
               </button>
