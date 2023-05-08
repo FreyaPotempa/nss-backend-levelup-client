@@ -6,25 +6,25 @@ import {
 } from "../../managers/EventManager";
 import { useEffect, useState } from "react";
 import { getSingleGame } from "../../managers/GameManager";
+import { getGames } from "../../managers/GameManager";
 
 export const EventForm = () => {
   const { event_id } = useParams();
   const navigate = useNavigate();
+  const [games, setGames] = useState([]);
   const [currentEvent, setCurrentEvent] = useState({
     description: "",
     date: "",
     time: "",
+    gameId: 0,
   });
 
   useEffect(() => {
     if (event_id) {
       getSingleEvent(event_id).then((eventObj) => setCurrentEvent(eventObj));
     }
+    getGames().then((data) => setGames(data));
   }, [event_id]);
-
-  //   useEffect(() => {
-  //     getGameTypes().then((data) => setGameTypes(data));
-  //   }, []);
 
   const changeEventState = (domEvent) => {
     const { name, value } = domEvent.target;
@@ -75,6 +75,22 @@ export const EventForm = () => {
             value={currentEvent.time}
             onChange={changeEventState}
           />
+        </div>
+        <div>
+          <select
+            name="game"
+            value={currentEvent.game}
+            onChange={changeEventState}
+          >
+            <option value="0">Select a Game</option>
+            {games.map((g) => {
+              return (
+                <option key={g.id} value={g.id}>
+                  {g.title}
+                </option>
+              );
+            })}
+          </select>
         </div>
       </fieldset>
 

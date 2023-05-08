@@ -31,9 +31,11 @@ export const EventList = (props) => {
       </button>
       <article className="events">
         {events.map((event) => {
+          console.log(event);
           return (
             <section key={`event--${event.id}`} className="event">
               <div className="event__description">{event.description}</div>
+              <div>Playing {event.game_id}</div>
               <div className="event__date">
                 On {event.date} at {event.time}
               </div>
